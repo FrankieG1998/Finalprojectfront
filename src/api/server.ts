@@ -19,7 +19,7 @@ export const server_calls ={
     },
 
     create: async(data: any = {}) =>{
-        const response = await fetch(`https://image-gallery-sgt2.onrender.com/api/images`,
+        const response = await fetch(`https://finalprojectback-dqrp.onrender.com/images`,
         {
             method: 'POST',
             headers:{
@@ -37,7 +37,7 @@ export const server_calls ={
     },
 
     update: async(id:string, data: any = {}) =>{
-        const response = await fetch(`https://image-gallery-sgt2.onrender.com/api/images/${id}`,
+        const response = await fetch(`https://finalprojectback-dqrp.onrender.com/images/${id}`,
         {
             method: 'POST',
             headers:{
@@ -55,7 +55,7 @@ export const server_calls ={
     },
 
     delete: async(id:string) =>{
-        const response = await fetch(`https://image-gallery-sgt2.onrender.com/api/images/${id}`,
+        const response = await fetch(`https://finalprojectback-dqrp.onrender.com/images/${id}`,
         {
             method: 'DELETE',
             headers:{
