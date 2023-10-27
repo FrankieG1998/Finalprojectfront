@@ -2,7 +2,7 @@
   "name": "react_phone_book_codealong",
   "private": true,
   "version": "0.0.0",
-  "author": "Qubayl90",
+  "author": "FrankieG1998",
   "type": "module",
   "scripts": {
     "dev": "vite",
