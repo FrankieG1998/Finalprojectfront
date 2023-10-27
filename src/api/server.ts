@@ -2,7 +2,7 @@ let token = "a8c0d70f8bc675e7a901927730c3774aa1d55532177e3796"
 
 export const server_calls ={
     get: async () => {
-        const response = await fetch(`https://image-gallery-sgt2.onrender.com/api/images`,
+        const response = await fetch(`https://finalprojectback-dqrp.onrender.com/images`,
         {
             method: 'GET',
             headers:{
