@@ -11,7 +11,6 @@ const columns: GridColDef[] = [
     {field: 'id', headerName: "ID" }, //hide: true 
     {field: 'image_title', headerName: 'Image Title', flex: 1}, 
     {field: 'creator_name', headerName: 'Creator Name', flex: 1},
-    {field: 'no_of_downloads', headerName: 'No of Downloads', flex: 1},
     {field: 'image_type', headerName: 'Image Type', flex: 1},
     {field: 'image_url', headerName: 'Image URL', flex: 1}
 ]
