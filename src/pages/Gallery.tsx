@@ -11,7 +11,7 @@ function gallery() {
   //let sliderImages: Array<objType> = [];
   
   const sliderImages = [{
-        url: "https://images.unsplash.com/photo-1500051638674-ff996a0ec29e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1218&q=80",
+        url: "https://content.api.news/v3/images/bin/f3e024e0f1063afd90e1c94664862e10?width=768",
      },];
 
   for (let i=0; i<imageData.length; i++){
