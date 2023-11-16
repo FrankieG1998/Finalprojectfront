@@ -4,7 +4,7 @@ import Input from './Input'
 import {useForm} from 'react-hook-form';
 import {server_calls} from '../api/server';
 import { useDispatch, useStore } from 'react-redux';
-import { chooseImageTitle, chooseCreatorName, chooseImageType, chooseImageUrl, chooseNoOfDownloads } from '../redux/slices/RootSlice';
+import { chooseImageTitle, chooseCreatorName, chooseImageType, chooseImageUrl } from '../redux/slices/RootSlice';
 
 //interfaces
 interface ImageFormProps {
@@ -34,7 +34,6 @@ const ImageForm = (props:ImageFormProps) => {
       dispatch(chooseImageTitle(data.image_title));
       dispatch(chooseImageType(data.image_type));
       dispatch(chooseImageUrl(data.image_url));
-      dispatch(chooseNoOfDownloads(data.no_of_downloads));
 
       server_calls.create(store.getState());
 
@@ -56,10 +55,6 @@ const ImageForm = (props:ImageFormProps) => {
         <div>
           <label htmlFor="image_url"> Image URL</label>
             <Input {...register('image_url')} name="image_url" placeholder="Image URL" />
-        </div>
-        <div>
-          <label htmlFor="no_of_downloads"> No of Downloads</label>
-            <Input {...register('no_of_downloads')} name="no_of_downloads" placeholder="No of Downloads" />
         </div>
         <div>
           <label htmlFor="image_type"> Image Type</label>
