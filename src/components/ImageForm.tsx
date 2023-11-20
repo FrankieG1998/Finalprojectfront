@@ -1,5 +1,5 @@
 import React, { useState } from 'react'; // Make sure React is in scope since we're using JSX
-import Button from './Button'; // Assuming Button is a custom component that doesn't accept 'type' prop
+//import Button from './Button'; // Assuming Button is a custom component that doesn't accept 'type' prop
 // Import Input only if you are using it
 import { useForm } from 'react-hook-form';
 import { server_calls } from '../api/server';
