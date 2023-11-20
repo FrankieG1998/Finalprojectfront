@@ -1,85 +1,85 @@
-import React, { useState, useEffect } from 'react'; // Import useEffect
+import { useState, useEffect } from 'react';
 import Button from "./Button";
 import Modal from "./Modal";
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { getAuth } from 'firebase/auth'; // Import Firebase Authentication
+import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Import Firebase Authentication
+import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage'; // Import Firebase Storage
 
 const columns: GridColDef[] = [
-    { field: 'id', headerName: "ID" }, // consider using 'hide: true' if you don't want to display the ID
-    { field: 'image_title', headerName: 'Image Title', flex: 1 },
-    { field: 'creator_name', headerName: 'Creator Name', flex: 1 },
-    { field: 'image_type', headerName: 'Image Type', flex: 1 },
-    { field: 'image_url', headerName: 'Image URL', flex: 1 }
+    { field: 'id', headerName: "ID", width: 90 },
+    { field: 'image_title', headerName: 'Image Title', width: 150 },
+    { field: 'creator_name', headerName: 'Creator Name', width: 150 },
+    { field: 'image_type', headerName: 'Image Type', width: 110 },
+    { field: 'image_url', headerName: 'Image URL', width: 200 }
 ];
 
 function DataTable() {
     const [open, setOpen] = useState(false);
-    const [imageData, setImageData] = useState([]); // State to hold image data
+    const [imageData, setImageData] = useState([]);
     const [selectionModel, setSelectionModel] = useState<string[]>([]);
-    const auth = getAuth(); // Initialize Firebase Auth
+    const auth = getAuth();
+    const storage = getStorage();
 
     useEffect(() => {
-        // Function to fetch data for the current user
-        const fetchData = async () => {
-            if (auth.currentUser) {
-                const userId = auth.currentUser.uid;
-                try {
-                    const response = await server_calls.getUserImages(userId); // A hypothetical function to fetch user-specific images
-                    setImageData(response.data);
-                } catch (error) {
-                    console.error("Error fetching data: ", error);
-                }
+        // This will run when the component mounts and whenever the auth state changes
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const userFolderRef = ref(storage, `images/${user.uid}`);
+                listAll(userFolderRef)
+                    .then((res) => {
+                        const imageRefs = res.items;
+                        return Promise.all(imageRefs.map((imageRef) => 
+                            getDownloadURL(imageRef).then((url) => ({
+                                id: imageRef.name,
+                                image_title: imageRef.name, // You might want to extract the title differently
+                                creator_name: user.displayName || user.email, // Adjust as needed
+                                image_type: imageRef.name.split('.').pop(), // Assumes type is the file extension
+                                image_url: url
+                            }))
+                        ));
+                    })
+                    .then((images) => {
+                        setImageData(images);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching images: ", error);
+                    });
             }
-        };
+        });
+    }, [auth, storage]);
 
-        fetchData();
-    }, [auth.currentUser]); // Effect runs when the currentUser changes
-    
-    const handleOpen = () =>{
-        setOpen(true)
-    }
-    const handleClose= () =>{
-        setOpen(false)
-    }
+    const handleOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
 
-    const deleteData = () =>{
-        server_calls.delete(selectionModel[0])
-        getData();
-        console.log(`Selection model: ${selectionModel}`);
-        setTimeout(() => {window.location.reload ()}, 1000)
-    }
-    
+    // Define your deleteData function here if needed
 
     return (
-    <>
-    <Modal
-        id={selectionModel}
-        open={open}
-        onClose={handleClose}
-    />
-    <div className="flex flex-row">
-        <div>
-            <button
-            className="p-3 bg-slate-300 rounded m-3 hover:bg-slate-800 hover:text-white"
-            onClick={()=>handleOpen()}
-            >
-                Add New Image
-            </button>
-        </div>
-        <Button onClick={handleOpen} className="p-3 bg-slate-300 m-3 rounded hover:bg-slate-800 hover:text-white"> Update Image </Button>
-        <Button onClick={deleteData} className="p-3 bg-slate-300 m-3 rounded hover:bg-slate-800 hover:text-white"> Delete Image </Button>
-    </div>
-        <div className={ open ? "hidden" : "container mx-10 my-5 flex flex-col"} style={{ height: 400, width: '100%'}}>
-            <h2 className="p-3 bg-slate-300 my-2 rounded"> My Images</h2>
-            <DataGrid rows={imageData} columns={columns} //rowsPerPageOptions={[5]} 
-            checkboxSelection={true} 
-            onRowSelectionModelChange={(item:any) => {
-                setSelectionModel(item)
-            }}
-            />
-        </div>
-    </>
-  )
+        <>
+            <Modal id={selectionModel} open={open} onClose={handleClose} />
+            <div className="flex flex-row">
+                <Button onClick={handleOpen} className="p-3 bg-slate-300 rounded m-3 hover:bg-slate-800 hover:text-white">
+                    Add New Image
+                </Button>
+                {/* Other buttons */}
+            </div>
+            <div style={{ height: 400, width: '100%' }}>
+                <h2>My Images</h2>
+                <DataGrid
+                    rows={imageData}
+                    columns={columns}
+                    checkboxSelection
+                    onSelectionModelChange={(newSelectionModel) => {
+                        setSelectionModel(newSelectionModel);
+                    }}
+                    pageSize={5}
+                />
+            </div>
+        </>
+    );
 }
 
-export default DataTable
+export default DataTable;
