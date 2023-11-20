@@ -17,6 +17,11 @@ const ImageForm = (props:ImageFormProps) => {
   const { register, handleSubmit } = useForm({})
   const dispatch =useDispatch();
   const store = useStore();
+  const [selectedFile, setSelectedFile] = useState(null);
+  
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
 
   const onSubmit = (data: any, event: any) => {
     console.log(`ID: ${ typeof props.id}`);
@@ -34,6 +39,7 @@ const ImageForm = (props:ImageFormProps) => {
   
       // Add the image URL to the form data
       data.image_url = imageUrl;
+    }
     
     if (props.id && props.id.length >0){
       server_calls.update(props.id[0], data)
