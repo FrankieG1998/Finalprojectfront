@@ -6,25 +6,30 @@ import { server_calls } from '../api/server';
 import { useDispatch, useStore } from 'react-redux';
 import { chooseImageTitle, chooseCreatorName, chooseImageType, chooseImageUrl } from '../redux/slices/RootSlice';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getAuth } from 'firebase/auth'; // Import the authentication module
+
 
 interface ImageFormProps {
   id?: string[];
 }
 
 const ImageForm = (props: ImageFormProps) => {
-  const { handleSubmit, reset } = useForm(); // Removed register if it's not being used
+ const { handleSubmit, reset } = useForm();
   const dispatch = useDispatch();
   const store = useStore();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const auth = getAuth(); // Initialize Firebase Auth
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedFile(e.target.files ? e.target.files[0] : null);
   };
-
   const onSubmit = async (data: any) => { // Removed event parameter
-    if (selectedFile) {
+ if (selectedFile && auth.currentUser) {
+      // Use the user's UID for the directory name
+      const userFolder = auth.currentUser.uid; 
       const storage = getStorage();
-      const storageRef = ref(storage, `images/${selectedFile.name}`);
+      // Include the userFolder in the reference path
+      const storageRef = ref(storage, `images/${userFolder}/${selectedFile.name}`);
       try {
         const uploadResult = await uploadBytes(storageRef, selectedFile);
         const imageUrl = await getDownloadURL(uploadResult.ref);
