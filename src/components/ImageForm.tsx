@@ -1,50 +1,42 @@
-import React, { useState } from 'react'; // Import React and useState
-import Button from './Button'
-import Input from './Input'
-
+import React, { useState } from 'react'; // Make sure React is in scope since we're using JSX
+import Button from './Button'; // Assuming Button is a custom component that doesn't accept 'type' prop
+// Import Input only if you are using it
 import { useForm } from 'react-hook-form';
 import { server_calls } from '../api/server';
 import { useDispatch, useStore } from 'react-redux';
 import { chooseImageTitle, chooseCreatorName, chooseImageType, chooseImageUrl } from '../redux/slices/RootSlice';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-// Interfaces
 interface ImageFormProps {
   id?: string[];
 }
 
 const ImageForm = (props: ImageFormProps) => {
-  const { register, handleSubmit, reset } = useForm(); // Include reset from useForm
+  const { handleSubmit, reset } = useForm(); // Removed register if it's not being used
   const dispatch = useDispatch();
   const store = useStore();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null); // Specify the type for selectedFile
-  
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      setSelectedFile(files[0]);
-    }
+    setSelectedFile(e.target.files ? e.target.files[0] : null);
   };
 
-  const onSubmit = async (data: any, event: React.BaseSyntheticEvent) => { // Make onSubmit async
-    event.preventDefault(); // Prevent the default form submission
+  const onSubmit = async (data: any) => { // Removed event parameter
     if (selectedFile) {
       const storage = getStorage();
       const storageRef = ref(storage, `images/${selectedFile.name}`);
-  
       try {
         const uploadResult = await uploadBytes(storageRef, selectedFile);
         const imageUrl = await getDownloadURL(uploadResult.ref);
         data.image_url = imageUrl;
       } catch (error) {
         console.error('Error uploading the file', error);
-        return; // Stop the function if the upload fails
+        return;
       }
     }
     
     if (props.id && props.id.length > 0) {
       await server_calls.update(props.id[0], data);
-      console.log(`Updated: ${data.image_title} ${props.id}`);
     } else {
       dispatch(chooseCreatorName(data.creator_name));
       dispatch(chooseImageTitle(data.image_title));
@@ -53,19 +45,20 @@ const ImageForm = (props: ImageFormProps) => {
 
       await server_calls.create(store.getState());
     }
-    reset(); // Reset the form fields after submission
+    reset();
     setTimeout(() => { window.location.reload() }, 1000);
   }
 
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* ...other form fields... */}
+        {/* Form fields here */}
         <input type="file" onChange={handleFileChange} />
         <div className="flex p-1">
-          <Button type="submit" className='flex justify-center m-3 bg-slate-300 p-2 rounded hover:bg-slate-800 text-white'>
+          {/* Use 'button' instead of 'Button' if it's a standard HTML button element */}
+          <button type="submit" className='flex justify-center m-3 bg-slate-300 p-2 rounded hover:bg-slate-800 text-white'>
             Submit
-          </Button>
+          </button>
         </div>
       </form>
     </div>
