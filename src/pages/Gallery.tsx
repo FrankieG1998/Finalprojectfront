@@ -3,8 +3,12 @@ import { useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
 
+type SliderImage = {
+    url: string;
+};
+
 function Gallery() {
-    const [sliderImages, setSliderImages] = useState([]);
+    const [sliderImages, setSliderImages] = useState<SliderImage[]>([]);
     const auth = getAuth();
     const storage = getStorage();
 
