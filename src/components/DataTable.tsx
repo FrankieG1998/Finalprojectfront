@@ -3,7 +3,7 @@ import Button from "./Button";
 import Modal from "./Modal";
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, listAll, getDownloadURL, deleteObject } from 'firebase/storage';
 
 type ImageRowType = {
     id: string;
@@ -54,7 +54,21 @@ function DataTable() {
             }
         });
     }, [auth, storage]);
-
+    
+    const deleteSelectedImages = async () => {
+            const promises = selectionModel.map(async (imageName) => {
+                const imageRef = ref(storage, `images/${auth.currentUser?.uid}/${imageName}`);
+                await deleteObject(imageRef); // Delete the image from Firebase Storage
+            });
+    
+            try {
+                await Promise.all(promises); // Wait for all delete operations to complete
+                setImageData(prev => prev.filter(row => !selectionModel.includes(row.id))); // Update state to remove deleted images
+            } catch (error) {
+                console.error("Error deleting images: ", error);
+            }
+        };
+    
     const handleOpen = () => {
         setOpen(true);
     };
@@ -62,28 +76,28 @@ function DataTable() {
         setOpen(false);
     };
 
-    // Define your deleteData function here if needed
-
     return (
-        <>
+<>
             <Modal id={selectionModel as string[]} open={open} onClose={handleClose} />
             <div className="flex flex-row">
                 <Button onClick={handleOpen} className="p-3 bg-slate-300 rounded m-3 hover:bg-slate-800 hover:text-white">
                     Add New Image
                 </Button>
+                <Button onClick={deleteSelectedImages} className="p-3 bg-slate-300 rounded m-3 hover:bg-slate-800 hover:text-white">
+                    Delete Selected Image
+                </Button>
                 {/* Other buttons */}
             </div>
             <div style={{ height: 400, width: '100%' }}>
                 <h2>My Images</h2>
-            <DataGrid
-                        rows={imageData}
-                        columns={columns}
-                        checkboxSelection
-                        onRowSelectionModelChange={(newSelectionModel) => {
-                            setSelectionModel(newSelectionModel);
-                        }}
-                        // Removed pageSize property
-                    />
+                <DataGrid
+                    rows={imageData}
+                    columns={columns}
+                    checkboxSelection
+                    onRowSelectionModelChange={(newSelectionModel) => {
+                        setSelectionModel(newSelectionModel);
+                    }}
+                />
             </div>
         </>
     );
