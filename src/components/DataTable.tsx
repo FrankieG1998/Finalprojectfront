@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import Button from "./Button";
 import Modal from "./Modal";
-import { DataGrid, GridColDef, GridSelectionModel } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
 
-// Define the type for a row in your data grid
 type ImageRowType = {
     id: string;
     image_title: string;
@@ -15,7 +14,7 @@ type ImageRowType = {
 };
 
 const columns: GridColDef[] = [
-    { field: 'id', headerName: "ID", width: 90, hide: true },
+    { field: 'id', headerName: "ID", width: 90 }, // Removed 'hide' property
     { field: 'image_title', headerName: 'Image Title', width: 150 },
     { field: 'creator_name', headerName: 'Creator Name', width: 150 },
     { field: 'image_type', headerName: 'Image Type', width: 110 },
@@ -25,7 +24,7 @@ const columns: GridColDef[] = [
 function DataTable() {
     const [open, setOpen] = useState(false);
     const [imageData, setImageData] = useState<ImageRowType[]>([]);
-    const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
+    const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
     const auth = getAuth();
     const storage = getStorage();
 
@@ -76,15 +75,15 @@ function DataTable() {
             </div>
             <div style={{ height: 400, width: '100%' }}>
                 <h2>My Images</h2>
-                <DataGrid
-                    rows={imageData}
-                    columns={columns}
-                    checkboxSelection
-                    onRowSelectionModelChange={(newSelectionModel) => {
-                        setSelectionModel(newSelectionModel);
-                    }}
-                    pageSize={5}
-                />
+            <DataGrid
+                        rows={imageData}
+                        columns={columns}
+                        checkboxSelection
+                        onRowSelectionModelChange={(newSelectionModel) => {
+                            setSelectionModel(newSelectionModel);
+                        }}
+                        // Removed pageSize property
+                    />
             </div>
         </>
     );
