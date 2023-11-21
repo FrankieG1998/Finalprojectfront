@@ -8,7 +8,7 @@ type SliderImage = {
 };
 
 function Gallery() {
-    const [sliderImages, setSliderImages] = useState<SliderImage[]>([]);
+    const [sliderImages, setSliderImages] = useState([]);
     const auth = getAuth();
     const storage = getStorage();
 
@@ -35,20 +35,20 @@ function Gallery() {
     console.log(sliderImages);
 
     return (
-        <div>
-            <h3 className="flex justify-center m-2">
-                Welcome to My Image Gallery
-            </h3>
+<div>
+            <h3 className="flex justify-center m-2">Welcome to My Image Gallery</h3>
             <div className="flex justify-center">
-                <SimpleImageSlider
-                    width='80%'
-                    height='80%'
-                    images={sliderImages}
-                    showNavs={true}
-                    showBullets={false}
-                    autoPlay={true}
-                    autoPlayDelay={1.0}
-                />
+                {sliderImages.length > 0 && (
+                    <SimpleImageSlider
+                        width='80%'
+                        height='80%'
+                        images={sliderImages}
+                        showNavs={true}
+                        showBullets={false}
+                        autoPlay={true}
+                        autoPlayDelay={2.0}
+                    />
+                )}
             </div>
         </div>
     )
