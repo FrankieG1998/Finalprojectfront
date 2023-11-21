@@ -1,12 +1,21 @@
 import { useState, useEffect } from 'react';
 import Button from "./Button";
 import Modal from "./Modal";
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Import Firebase Authentication
-import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage'; // Import Firebase Storage
+import { DataGrid, GridColDef, GridSelectionModel } from '@mui/x-data-grid';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
+
+// Define the type for a row in your data grid
+type ImageRowType = {
+    id: string;
+    image_title: string;
+    creator_name: string | null;
+    image_type: string | undefined;
+    image_url: string;
+};
 
 const columns: GridColDef[] = [
-    { field: 'id', headerName: "ID", width: 90 },
+    { field: 'id', headerName: "ID", width: 90, hide: true },
     { field: 'image_title', headerName: 'Image Title', width: 150 },
     { field: 'creator_name', headerName: 'Creator Name', width: 150 },
     { field: 'image_type', headerName: 'Image Type', width: 110 },
@@ -15,13 +24,12 @@ const columns: GridColDef[] = [
 
 function DataTable() {
     const [open, setOpen] = useState(false);
-    const [imageData, setImageData] = useState([]);
-    const [selectionModel, setSelectionModel] = useState<string[]>([]);
+    const [imageData, setImageData] = useState<ImageRowType[]>([]);
+    const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
     const auth = getAuth();
     const storage = getStorage();
 
     useEffect(() => {
-        // This will run when the component mounts and whenever the auth state changes
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const userFolderRef = ref(storage, `images/${user.uid}`);
@@ -31,9 +39,9 @@ function DataTable() {
                         return Promise.all(imageRefs.map((imageRef) => 
                             getDownloadURL(imageRef).then((url) => ({
                                 id: imageRef.name,
-                                image_title: imageRef.name, // You might want to extract the title differently
-                                creator_name: user.displayName || user.email, // Adjust as needed
-                                image_type: imageRef.name.split('.').pop(), // Assumes type is the file extension
+                                image_title: imageRef.name,
+                                creator_name: user.displayName || user.email,
+                                image_type: imageRef.name.split('.').pop(),
                                 image_url: url
                             }))
                         ));
@@ -59,7 +67,7 @@ function DataTable() {
 
     return (
         <>
-            <Modal id={selectionModel} open={open} onClose={handleClose} />
+            <Modal id={selectionModel as string[]} open={open} onClose={handleClose} />
             <div className="flex flex-row">
                 <Button onClick={handleOpen} className="p-3 bg-slate-300 rounded m-3 hover:bg-slate-800 hover:text-white">
                     Add New Image
@@ -72,7 +80,7 @@ function DataTable() {
                     rows={imageData}
                     columns={columns}
                     checkboxSelection
-                    onSelectionModelChange={(newSelectionModel) => {
+                    onRowSelectionModelChange={(newSelectionModel) => {
                         setSelectionModel(newSelectionModel);
                     }}
                     pageSize={5}
