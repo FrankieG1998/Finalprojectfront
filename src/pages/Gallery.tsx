@@ -32,6 +32,7 @@ function Gallery() {
             }
         });
     }, [auth, storage]);
+    console.log(sliderImages);
 
     return (
         <div>
