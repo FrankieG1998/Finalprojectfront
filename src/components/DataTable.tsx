@@ -88,6 +88,9 @@ function DataTable() {
                 <Button onClick={deleteSelectedImages} className="p-3 bg-slate-300 rounded m-3 hover:bg-slate-800 hover:text-white">
                     Delete Selected Image
                 </Button>
+                <Button onClick={deleteSelectedImages} className="p-3 bg-slate-300 rounded m-3 hover:bg-slate-800 hover:text-white">
+                    Edit Image
+                </Button>
             </div>
             <div style={{ height: 400, width: '100%' }}>
                 <h2>My Images</h2>
