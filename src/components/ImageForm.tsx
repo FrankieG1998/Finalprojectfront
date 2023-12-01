@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { server_calls } from '../api/server';
 import { useDispatch, useStore } from 'react-redux';
 import { chooseImageTitle, chooseCreatorName, chooseImageType, chooseImageUrl } from '../redux/slices/RootSlice';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL, updateMetadata } from 'firebase/storage';
 import { getAuth } from 'firebase/auth'; // Import the authentication module
 
 
@@ -24,7 +24,7 @@ const ImageForm = (props: ImageFormProps) => {
     setSelectedFile(e.target.files ? e.target.files[0] : null);
   };
   const onSubmit = async (data: any) => { // Removed event parameter
- if (selectedFile && auth.currentUser) {
+ if (selectedFile && auth.currentUser && props.id?.length==0) {
       // Use the user's UID for the directory name
       const userFolder = auth.currentUser.uid; 
       const storage = getStorage();
@@ -38,6 +38,22 @@ const ImageForm = (props: ImageFormProps) => {
         console.error('Error uploading the file', error);
         return;
       }
+    }else {
+      const userFolder = auth.currentUser.uid; 
+      const storage = getStorage();
+      const storageRef = ref(storage, `images/${userFolder}/${selectedFile.name}`);
+      let newMetadata = {
+        customMetadata: {
+          name: data.name
+        }
+      }
+      updateMetadata(storageRef, newMetadata)
+      .then((metadata) => {
+        console.log(metadata)
+      })
+      .catch((err)=> {
+        throw new Error (err)
+      })
     }
     
     if (props.id && props.id.length > 0) {
@@ -59,6 +75,10 @@ const ImageForm = (props: ImageFormProps) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Form fields here */}
         <input type="file" onChange={handleFileChange} />
+        <div>
+          <label htmlFor="name">Name</label>
+          <Input {...register('name')} name='name' placeholder="Name" />
+        </div>
         <div className="flex p-1">
           {/* Use 'button' instead of 'Button' if it's a standard HTML button element */}
           <button type="submit" className='flex justify-center m-3 bg-slate-300 p-2 rounded hover:bg-slate-800 text-white'>
