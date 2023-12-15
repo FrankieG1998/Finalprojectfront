@@ -69,4 +69,21 @@ export const server_calls ={
         }
         return;
     },
+    const axios = require('axios');
+
+const options = {
+  method: 'GET',
+  url: 'https://f1-drivers-quotes.p.rapidapi.com/quotes',
+  headers: {
+    'X-RapidAPI-Key': 'SIGN-UP-FOR-KEY',
+    'X-RapidAPI-Host': 'f1-drivers-quotes.p.rapidapi.com'
+  }
+};
+
+try {
+	const response = await axios.request(options);
+	console.log(response.data);
+} catch (error) {
+	console.error(error);
+}
 }
