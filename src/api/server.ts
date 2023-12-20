@@ -1,89 +1,18 @@
 let token = "196e1d0a5341fce18ebdd73f592772e3e85d91f1a2dd2582"
+import axios from "axios";
 
-export const server_calls ={
-    get: async () => {
-        const response = await fetch(`https://finalprojectback-dqrp.onrender.com/images`,
-        {
-            method: 'GET',
-            headers:{
-                'Content-Type': 'application/json', 
-                //'Access-Control-Allow-Origin': '*',
-                'x-access-token': `Bearer ${token}`
-            },
-            //mode: 'cors'
-        });
-        if (!response.ok){
-            throw new Error('Failed to fetch data');
-        }
-        return await response.json()
-    },
-
-    create: async(data: any = {}) =>{
-        const response = await fetch(`https://finalprojectback-dqrp.onrender.com/images`,
-        {
-            method: 'POST',
-            headers:{
-                'Content-Type': 'application/json', 
-                //'Access-Control-Allow-Origin': '*',
-                'x-access-token': `Bearer ${token}`
-            },
-            body: JSON.stringify(data)
-            //mode: 'cors'
-        });
-        if (!response.ok){
-            throw new Error('Failed to create data');
-        }
-        return await response.json()
-    },
-
-    update: async(id:string, data: any = {}) =>{
-        const response = await fetch(`https://finalprojectback-dqrp.onrender.com/images/${id}`,
-        {
-            method: 'POST',
-            headers:{
-                'Content-Type': 'application/json', 
-                //'Access-Control-Allow-Origin': '*',
-                'x-access-token': `Bearer ${token}`
-            },
-            body: JSON.stringify(data)
-            //mode: 'cors'
-        });
-        if (!response.ok){
-            throw new Error('Failed to update data');
-        }
-        return await response.json()
-    },
-
-    delete: async(id:string) =>{
-        const response = await fetch(`https://finalprojectback-dqrp.onrender.com/images/${id}`,
-        {
-            method: 'DELETE',
-            headers:{
-                'Content-Type': 'application/json', 
-                'x-access-token': `Bearer ${token}`
-            },
-            //mode: 'cors'
-        });
-        if (!response.ok){
-            throw new Error('Failed to delete data');
-        }
-        return;
-    },
-    const axios = require('axios');
-
-const options = {
-  method: 'GET',
-  url: 'https://f1-drivers-quotes.p.rapidapi.com/quotes',
-  headers: {
-    'X-RapidAPI-Key': 'SIGN-UP-FOR-KEY',
-    'X-RapidAPI-Host': 'f1-drivers-quotes.p.rapidapi.com'
-  }
-};
-
-try {
-	const response = await axios.request(options);
-	console.log(response.data);
-} catch (error) {
-	console.error(error);
-}
-}
+export const options = {
+      method: 'GET',
+      url: 'https://f1-drivers-quotes.p.rapidapi.com/quotes',
+      headers: {
+        'X-RapidAPI-Key': '381890a8e7msha5241150939a6e4p175032jsn8da9e5a84293',
+        'X-RapidAPI-Host': 'f1-drivers-quotes.p.rapidapi.com'
+      }
+    };
+    
+    try {
+        const response = await axios.request(options);
+        console.log(response.data);
+    } catch (error) {
+        console.error(error);
+    }
