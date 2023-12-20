@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Button from "./Button";
 import Modal from "./Modal";
+import { options } from '../api/server';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getStorage, ref, listAll, getDownloadURL, deleteObject, getMetadata } from 'firebase/storage';
@@ -20,7 +21,7 @@ const columns: GridColDef[] = [
     { field: 'image_type', headerName: 'Image Type', width: 110 },
     { field: 'image_url', headerName: 'Image URL', width: 200 }
 ];
-
+// test
 function DataTable() {
     const [open, setOpen] = useState(false);
     const [imageData, setImageData] = useState<ImageRowType[]>([]);
@@ -35,11 +36,18 @@ function DataTable() {
                 listAll(userFolderRef)
                     .then((res) => {
                         const imageRefs = res.items;
+                        console.log(imageRefs)
                         return Promise.all(imageRefs.map((imageRef) => 
-                        getMetadata(imageRef).then((metadata)=>  ({
+                        // console.log(imageRef)
+                        getMetadata(imageRef)
+                        // .then((metadata) => {console.log(metadata)})
+                        .then((metadata) => ({
                             id: metadata.name,
-                            name: metadata.customMetadata.name
+                            name: metadata.customMetadata?.name,
+                            // creator: metadata.customMetadata?.Creator,
+                            // image_url: metadata.fullPath
                         }))
+                        // .then((url) => ({ id: url.name }))
                             // getDownloadURL(imageRef).then((url) => ({
                             //     id: imageRef.name,
                             //     name: imageRef.name,
@@ -47,6 +55,7 @@ function DataTable() {
                             //     image_type: imageRef.name.split('.').pop(),
                             //     image_url: url
                             // }))
+                            // console.log(imageRef)
                         ));
                     })
                     .then((images) => {
@@ -73,7 +82,6 @@ function DataTable() {
             }
         };
 
-        const editimages = 
     
     const handleOpen = () => {
         setOpen(true);
@@ -81,6 +89,10 @@ function DataTable() {
     const handleClose = () => {
         setOpen(false);
     };
+
+    const getData = () => {
+        console.log(options.get())
+    }
 
     return (
         <>
@@ -94,7 +106,7 @@ function DataTable() {
                 <Button onClick={deleteSelectedImages} className="p-3 bg-slate-300 rounded m-3 hover:bg-slate-800 hover:text-white">
                     Delete Selected Image
                 </Button>
-                <Button onClick={editimages} className="p-3 bg-slate-300 rounded m-3 hover:bg-slate-800 hover:text-white">
+                <Button onClick={handleOpen} className="p-3 bg-slate-300 rounded m-3 hover:bg-slate-800 hover:text-white">
                     Edit Image
                 </Button>
             </div>
@@ -109,6 +121,7 @@ function DataTable() {
                     }}
                 />
             </div>
+            <button onClick={getData}>get data</button>
         </>
     );
 }
