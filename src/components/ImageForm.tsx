@@ -4,17 +4,17 @@ import React, { useState } from 'react'; // Make sure React is in scope since we
 import { useForm } from 'react-hook-form';
 import { server_calls } from '../api/server';
 import { useDispatch, useStore } from 'react-redux';
-import { chooseImageTitle, chooseCreatorName, chooseImageType, chooseImageUrl } from '../redux/slices/RootSlice';
+import { chooseName, chooseCreatorName, chooseImageType, chooseImageUrl } from '../redux/slices/RootSlice';
 import { getStorage, ref, uploadBytes, getDownloadURL, updateMetadata } from 'firebase/storage';
 import { getAuth } from 'firebase/auth'; // Import the authentication module
-
+import Input from './Input';
 
 interface ImageFormProps {
   id?: string[];
 }
 
 const ImageForm = (props: ImageFormProps) => {
- const { handleSubmit, reset } = useForm();
+ const { handleSubmit, reset, register } = useForm();
   const dispatch = useDispatch();
   const store = useStore();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -24,52 +24,46 @@ const ImageForm = (props: ImageFormProps) => {
     setSelectedFile(e.target.files ? e.target.files[0] : null);
   };
   const onSubmit = async (data: any) => { // Removed event parameter
- if (selectedFile && auth.currentUser && props.id?.length==0) {
-      // Use the user's UID for the directory name
-      const userFolder = auth.currentUser.uid; 
-      const storage = getStorage();
-      // Include the userFolder in the reference path
-      const storageRef = ref(storage, `images/${userFolder}/${selectedFile.name}`);
-      try {
-        const uploadResult = await uploadBytes(storageRef, selectedFile);
-        const imageUrl = await getDownloadURL(uploadResult.ref);
-        data.image_url = imageUrl;
-      } catch (error) {
-        console.error('Error uploading the file', error);
-        return;
-      }
-    }else {
-      const userFolder = auth.currentUser.uid; 
-      const storage = getStorage();
-      const storageRef = ref(storage, `images/${userFolder}/${selectedFile.name}`);
-      let newMetadata = {
-        customMetadata: {
-          name: data.name
+    console.log(data)
+    if (selectedFile && auth.currentUser && props.id?.length == 0) {
+      console.log("Test")
+        // Use the user's UID for the directory name
+        const userFolder = auth.currentUser.uid; 
+        const storage = getStorage();
+        // console.log(data)
+        // Include the userFolder in the reference path
+        const storageRef = ref(storage, `images/${userFolder}/${selectedFile.name}`);
+        try {
+          const uploadResult = await uploadBytes(storageRef, selectedFile);
+          const imageUrl = await getDownloadURL(uploadResult.ref);
+          data.image_url = imageUrl;
+        } catch (error) {
+          console.error('Error uploading the file', error);
+          return;
         }
+      } else {
+        const userFolder = auth.currentUser?.uid; 
+        const storage = getStorage();
+        // console.log(data)
+        // Include the userFolder in the reference path
+        const storageRef = ref(storage, `images/${userFolder}/${selectedFile?.name}`);
+
+        let newMetaData = {
+          customMetadata: {
+            name: data.name,
+            creator: data.Creator
+          },
+          // cacheControl: 'public, max-age=500',
+          // name: "Hello there"
+        }
+        updateMetadata(storageRef, newMetaData)
+          .then((metadata) => {
+            console.log(metadata)
+          })
+        }
+        reset();
+        setTimeout(() => { window.location.reload() }, 10000);
       }
-      updateMetadata(storageRef, newMetadata)
-      .then((metadata) => {
-        console.log(metadata)
-      })
-      .catch((err)=> {
-        throw new Error (err)
-      })
-    }
-    
-    if (props.id && props.id.length > 0) {
-      await server_calls.update(props.id[0], data);
-    } else {
-      dispatch(chooseCreatorName(data.creator_name));
-      dispatch(chooseImageTitle(data.image_title));
-      dispatch(chooseImageType(data.image_type));
-      dispatch(chooseImageUrl(data.image_url));
-
-      await server_calls.create(store.getState());
-    }
-    reset();
-    setTimeout(() => { window.location.reload() }, 1000);
-  }
-
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
